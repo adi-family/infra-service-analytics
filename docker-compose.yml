@@ -1,0 +1,40 @@
+services:
+  analytics:
+    build:
+      context: ../..
+      dockerfile: crates/adi-analytics-api/Dockerfile
+    environment:
+      - PORT=8093
+      - DATABASE_URL=${DATABASE_URL}
+      - RUST_LOG=${RUST_LOG:-info}
+    networks:
+      - coolify
+    labels:
+      - "traefik.enable=true"
+      # HTTPS router
+      - "traefik.http.routers.analytics.rule=Host(`adi.the-ihor.com`) && PathPrefix(`/api/analytics`)"
+      - "traefik.http.routers.analytics.entrypoints=https"
+      - "traefik.http.routers.analytics.tls=true"
+      - "traefik.http.routers.analytics.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.analytics.priority=5"
+      # Strip /api/analytics prefix before forwarding
+      - "traefik.http.routers.analytics.middlewares=analytics-stripprefix"
+      - "traefik.http.middlewares.analytics-stripprefix.stripprefix.prefixes=/api/analytics"
+      # HTTP to HTTPS redirect
+      - "traefik.http.routers.analytics-http.rule=Host(`adi.the-ihor.com`) && PathPrefix(`/api/analytics`)"
+      - "traefik.http.routers.analytics-http.entrypoints=http"
+      - "traefik.http.routers.analytics-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.analytics-http.priority=5"
+      # Service
+      - "traefik.http.services.analytics.loadbalancer.server.port=8093"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8093/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+networks:
+  coolify:
+    external: true
