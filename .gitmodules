@@ -1,0 +1,6 @@
+[submodule "adi-analytics-api"]
+	path = adi-analytics-api
+	url = git@github.com:adi-family/adi-analytics-api.git
+[submodule "lib-analytics-core"]
+	path = lib-analytics-core
+	url = git@github.com:adi-family/lib-analytics-core.git
