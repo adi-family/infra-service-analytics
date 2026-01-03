@@ -16,7 +16,7 @@ services:
       - "traefik.http.routers.analytics.entrypoints=https"
       - "traefik.http.routers.analytics.tls=true"
       - "traefik.http.routers.analytics.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.analytics.priority=5"
+      - "traefik.http.routers.analytics.priority=10"
       # Strip /api/analytics prefix before forwarding
       - "traefik.http.routers.analytics.middlewares=analytics-stripprefix"
       - "traefik.http.middlewares.analytics-stripprefix.stripprefix.prefixes=/api/analytics"
